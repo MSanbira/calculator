@@ -9,11 +9,35 @@ import HistoryAndMemory from "./components/historyAndMemory";
 
 class App extends Component {
   state = {
-    inputValue: 0
+    inputValue: 0,
+    chosenFunction: null,
+    calcBarText: "",
+    result: 0,
+    lastInput: 0,
+    numMemory: null
   };
 
-  handleAddNumToInput = num => {
-    console.log(num);
+  handleAddNumToInputFromBtn = num => {
+    let inputValue;
+    if (this.state.inputValue == 0) {
+      inputValue = num;
+    } else {
+      inputValue = (this.state.inputValue + num.toString()).substr(0, 15);
+    }
+    this.setState({ inputValue });
+  };
+
+  handleEditKeyboardInput = event => {
+    let inputValue;
+    if (this.state.inputValue == 0) {
+      inputValue = event.target.value.substr(1, 16);
+    } else {
+      inputValue = event.target.value.substr(0, 15);
+    }
+    if (event.target.value == "") {
+      inputValue = 0;
+    }
+    this.setState({ inputValue });
   };
 
   handleNewFunction = sign => {
@@ -26,9 +50,12 @@ class App extends Component {
         <div className="container">
           <div className="calc-container">
             <CalcBar />
-            <InputBar />
+            <InputBar
+              inputValue={this.state.inputValue}
+              onEditInput={this.handleEditKeyboardInput}
+            />
             <div className="btn-container">
-              <NumPad onNumClick={this.handleAddNumToInput} />
+              <NumPad onNumClick={this.handleAddNumToInputFromBtn} />
               <FunctionPad onFunctionClick={this.handleNewFunction} />
             </div>
           </div>
