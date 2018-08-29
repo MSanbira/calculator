@@ -79,7 +79,7 @@ class NumPad extends Component {
           </button>
           <button
             className="btn btn-number"
-            onClick={() => this.props.onNumClick("*")}
+            onClick={() => this.props.onFunctionClick("+-")}
           >
             + -
           </button>

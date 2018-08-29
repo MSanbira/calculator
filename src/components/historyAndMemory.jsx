@@ -12,7 +12,7 @@ class HistoryAndMemory extends Component {
         </div>
         <div className="memory-container">
           <h1>Memory</h1>
-          <h2>place holder</h2>
+          <h2>{this.props.numMemory !== null ? this.props.numMemory : ''}</h2>
         </div>
       </div>
     );
