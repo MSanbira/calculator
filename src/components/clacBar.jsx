@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class CalcBar extends Component {
 
     render() { 
-        return ( <p className="calc-bar">calcBar</p> );
+        return ( <p className="calc-bar">calc bar place holder</p> );
     }
 }
  

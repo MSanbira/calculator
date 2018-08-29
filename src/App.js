@@ -24,11 +24,13 @@ class App extends Component {
     return (
       <React.Fragment>
         <div className="container">
-          <CalcBar />
-          <InputBar />
-          <div className="btn-container">
-            <NumPad onNumClick={this.handleAddNumToInput} />
-            <FunctionPad onFunctionClick={this.handleNewFunction} />
+          <div className="calc-container">
+            <CalcBar />
+            <InputBar />
+            <div className="btn-container">
+              <NumPad onNumClick={this.handleAddNumToInput} />
+              <FunctionPad onFunctionClick={this.handleNewFunction} />
+            </div>
           </div>
           <HistoryAndMemory />
         </div>
