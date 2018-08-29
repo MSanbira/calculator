@@ -1,19 +1,38 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import CalcBar from "./components/clacBar";
+import InputBar from "./components/inputBar";
+import NumPad from "./components/numPad";
+import FunctionPad from "./components/functionPad";
+import HistoryAndMemory from "./components/historyAndMemory";
 
 class App extends Component {
+  state = {
+    inputValue: 0
+  };
+
+  handleAddNumToInput = num => {
+    console.log(num);
+  };
+
+  handleNewFunction = sign => {
+    console.log(sign);
+  };
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <React.Fragment>
+        <div className="container">
+          <CalcBar />
+          <InputBar />
+          <div className="btn-container">
+            <NumPad onNumClick={this.handleAddNumToInput} />
+            <FunctionPad onFunctionClick={this.handleNewFunction} />
+          </div>
+          <HistoryAndMemory />
+        </div>
+      </React.Fragment>
     );
   }
 }
