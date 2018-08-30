@@ -7,12 +7,14 @@ class HistoryAndMemory extends Component {
         <div className="history-container">
           <h1>History</h1>
           <div className="history-text">
-            <p>temp</p>
+            {this.props.historyText.map(line => (
+              <p key={line.key}>{line.text}</p>
+            ))}
           </div>
         </div>
         <div className="memory-container">
           <h1>Memory</h1>
-          <h2>{this.props.numMemory !== null ? this.props.numMemory : ''}</h2>
+          <h2>{this.props.numMemory !== null ? this.props.numMemory : ""}</h2>
         </div>
       </div>
     );

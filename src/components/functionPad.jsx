@@ -67,13 +67,13 @@ class FunctionPad extends Component {
         <div className="btns-row">
           <button
             className="btn btn-function"
-            onClick={() => this.props.onFunctionClick("X2")}
+            onClick={() => this.props.onFunctionClick("&#178;")}
           >
             X&#178;
           </button>
           <button
             className="btn btn-function"
-            onClick={() => this.props.onFunctionClick("sqr")}
+            onClick={() => this.props.onFunctionClick("&#8730;")}
           >
             &#8730;
           </button>

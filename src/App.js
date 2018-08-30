@@ -12,13 +12,14 @@ class App extends Component {
     inputValue: 0,
     calcBarText: "",
     calcBarSign: "",
-    chosenFunction: null,
+    chosenSign: null,
     firstValue: null,
     lastValue: null,
-    result: 0,
     numMemory: null,
     isDotInInput: false,
-    isWriteNextNum: false
+    isWriteNextNum: false,
+    historyText: [],
+    historyKey: 0
   };
 
   handleAddNumToInputFromBtn = num => {
@@ -33,7 +34,7 @@ class App extends Component {
     } else {
       if (this.state.inputValue === 0 || lastValue === null) {
         inputValue = num;
-        lastValue = 'temp';
+        lastValue = "temp";
       } else {
         inputValue = (this.state.inputValue + num.toString()).substr(0, 15);
       }
@@ -70,9 +71,9 @@ class App extends Component {
     } else if (sign === "+-") {
       this.changeSignInput();
     } else if (sign === "+" || sign === "-" || sign === "*" || sign === "/") {
-      this.handleChosenFunction(sign);
-    } else if (sign === "X2" || sign === "sqr") {
-      this.handleChosenFunction(sign);
+      this.handleChosenSign(sign);
+    } else if (sign === "&#178;" || sign === "&#8730;") {
+      this.handleChosenSign(sign);
       this.showResult();
     } else if (sign === "=") {
       this.showResult();
@@ -93,10 +94,9 @@ class App extends Component {
       inputValue: 0,
       calcBarText: "",
       calcBarSign: "",
-      chosenFunction: null,
+      chosenSign: null,
       firstValue: null,
       lastValue: null,
-      result: 0,
       numMemory: numMemory,
       isDotInInput: false,
       isWriteNextNum: false
@@ -125,21 +125,21 @@ class App extends Component {
     this.setState({ inputValue });
   };
 
-  handleChosenFunction = sign => {
+  handleChosenSign = sign => {
     let firstValue = this.state.firstValue;
     let calcBarText = this.state.calcBarText;
     const lastValue = null;
-    const chosenFunction = sign;
+    const chosenSign = sign;
     if (this.state.firstValue === null) {
       firstValue = this.state.inputValue;
     } else if (this.state.firstValue !== this.state.inputValue) {
       firstValue = this.getCalculation(
         this.state.firstValue,
-        this.state.chosenFunction,
+        this.state.chosenSign,
         this.state.inputValue
       );
-      this.setState({inputValue: firstValue});
-      calcBarText += " " + this.state.chosenFunction + " " + this.state.inputValue;
+      this.setState({ inputValue: firstValue });
+      calcBarText += " " + this.state.chosenSign + " " + this.state.inputValue;
     }
     if (firstValue === "Error") {
       this.setState({ inputValue: "Error" });
@@ -153,11 +153,40 @@ class App extends Component {
       lastValue: lastValue,
       calcBarText: calcBarText,
       calcBarSign: sign,
-      chosenFunction: chosenFunction
+      chosenSign: chosenSign
     });
   };
 
-  showResult = () => {};
+  showResult = () => {
+    let lastValue = this.state.lastValue;
+    if (this.state.lastValue === "temp" || this.state.lastValue === null) {
+      lastValue = this.state.inputValue;
+    }
+    let result = this.getCalculation(
+      this.state.firstValue,
+      this.state.chosenSign,
+      lastValue
+    );
+    const historyTextNew = {
+      text:
+        this.state.calcBarText +
+        this.state.chosenSign +
+        lastValue +
+        " = " +
+        result,
+      key: this.state.historyKey
+    };
+
+    this.setState({
+      inputValue: result,
+      firstValue: this.state.inputValue,
+      calcBarText: "",
+      calcBarSign: "",
+      historyText: this.state.historyText.concat(historyTextNew),
+      historyKey: this.state.historyKey + 1,
+      lastValue: lastValue
+    });
+  };
 
   getCalculation = (firstValue, sign, lastValue) => {
     const sum = eval(firstValue + sign + lastValue);
@@ -174,7 +203,10 @@ class App extends Component {
       <React.Fragment>
         <div className="container">
           <div className="calc-container">
-            <CalcBar calcBarText={this.state.calcBarText} calcBarSign={this.state.calcBarSign} />
+            <CalcBar
+              calcBarText={this.state.calcBarText}
+              calcBarSign={this.state.calcBarSign}
+            />
             <InputBar
               inputValue={this.state.inputValue}
               onEditInput={this.handleEditKeyboardInput}
@@ -187,7 +219,10 @@ class App extends Component {
               <FunctionPad onFunctionClick={this.handleNewFunction} />
             </div>
           </div>
-          <HistoryAndMemory numMemory={this.state.numMemory} />
+          <HistoryAndMemory
+            numMemory={this.state.numMemory}
+            historyText={this.state.historyText}
+          />
         </div>
       </React.Fragment>
     );

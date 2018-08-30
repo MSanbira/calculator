@@ -90,7 +90,7 @@ p {
 
 .calc-bar {
   width: 100%;
-  height: 45px;
+  height: 50px;
   background-color: lightgray;
   margin-bottom: 10px;
   padding: 5px 10px;
@@ -149,6 +149,7 @@ p {
 .history-container {
   height: 300px;
   border-bottom: solid darkgray 0.5px;
+  overflow: auto;
 }
 
 .memory-container {
