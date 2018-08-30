@@ -5,7 +5,10 @@ class HistoryAndMemory extends Component {
     return (
       <div className="history-memory-container">
         <div className="history-container">
-          <h1>History</h1>
+          <div className="history-header">
+            <h1>History</h1>
+            <button className="btn-clear-history" onClick={this.props.handleClearHistory}>clear</button>
+          </div>
           <div className="history-text">
             {this.props.historyText.map(line => (
               <p key={line.key}>{line.text}</p>

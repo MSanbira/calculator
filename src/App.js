@@ -16,30 +16,28 @@ class App extends Component {
     firstValue: null,
     lastValue: null,
     numMemory: null,
-    isDotInInput: false,
-    isWriteNextNum: false,
+    isWriteNewNum: false,
+    isInputChange: false,
     historyText: [],
     historyKey: 0
   };
 
   handleAddNumToInputFromBtn = num => {
-    let inputValue;
+    let inputValue = this.state.inputValue;
     let lastValue = this.state.lastValue;
-    if (num === ".") {
-      if (!this.state.isDotInInput) {
-        inputValue = (this.state.inputValue + num).substr(0, 15);
-        this.setState({ isDotInInput: true });
-        this.setState({ inputValue });
-      }
-    } else {
-      if (this.state.inputValue === 0 || lastValue === null) {
+    let isWriteNewNum = this.state.isWriteNewNum;
+    if (!isNaN(this.state.inputValue + num.toString())) {
+      if (this.state.inputValue === 0 || lastValue === null || isWriteNewNum === true) {
         inputValue = num;
-        lastValue = "temp";
+        isWriteNewNum = false;
+        if (lastValue === null) {
+          lastValue = "temp";
+        }
       } else {
         inputValue = (this.state.inputValue + num.toString()).substr(0, 15);
       }
-      this.setState({ inputValue, lastValue });
     }
+    this.setState({ inputValue, lastValue, isWriteNewNum });
   };
 
   handleEditKeyboardInput = event => {
@@ -55,6 +53,10 @@ class App extends Component {
       }
       this.setState({ inputValue });
     }
+  };
+
+  handleClearHistory = () => {
+    this.setState({ historyText: [] });
   };
 
   handleNewFunction = sign => {
@@ -80,11 +82,41 @@ class App extends Component {
     }
   };
 
+  render() {
+    return (
+      <React.Fragment>
+        <div className="container">
+          <div className="calc-container">
+            <CalcBar
+              calcBarText={this.state.calcBarText}
+              calcBarSign={this.state.calcBarSign}
+            />
+            <InputBar
+              inputValue={this.state.inputValue}
+              onEditInput={this.handleEditKeyboardInput}
+            />
+            <div className="btn-container">
+              <NumPad
+                onNumClick={this.handleAddNumToInputFromBtn}
+                onFunctionClick={this.handleNewFunction}
+              />
+              <FunctionPad onFunctionClick={this.handleNewFunction} />
+            </div>
+          </div>
+          <HistoryAndMemory
+            numMemory={this.state.numMemory}
+            historyText={this.state.historyText}
+            handleClearHistory={this.handleClearHistory}
+          />
+        </div>
+      </React.Fragment>
+    );
+  }
+
   DeleteInput = () => {
     const inputValue = 0;
     this.setState({
       inputValue: inputValue,
-      isDotInInput: false
     });
   };
 
@@ -98,8 +130,7 @@ class App extends Component {
       firstValue: null,
       lastValue: null,
       numMemory: numMemory,
-      isDotInInput: false,
-      isWriteNextNum: false
+      isWriteNewNum: false
     });
   };
 
@@ -153,24 +184,35 @@ class App extends Component {
       lastValue: lastValue,
       calcBarText: calcBarText,
       calcBarSign: sign,
-      chosenSign: chosenSign
+      chosenSign: chosenSign,
+      isInputChange: false
     });
   };
 
   showResult = () => {
     let lastValue = this.state.lastValue;
+    let calcBarText = this.state.calcBarText;
+    let isInputChange = this.state.isInputChange;
+    let isWriteNewNum = this.state.isWriteNewNum;
+    const firstValue = (isInputChange ? this.state.inputValue : this.state.firstValue);
     if (this.state.lastValue === "temp" || this.state.lastValue === null) {
       lastValue = this.state.inputValue;
+      isWriteNewNum = true;
+      isInputChange = true;
+    } else {
+      calcBarText = this.state.inputValue;
     }
     let result = this.getCalculation(
-      this.state.firstValue,
+      firstValue,
       this.state.chosenSign,
       lastValue
     );
     const historyTextNew = {
       text:
-        this.state.calcBarText +
+        calcBarText +
+        " " +
         this.state.chosenSign +
+        " " +
         lastValue +
         " = " +
         result,
@@ -179,12 +221,14 @@ class App extends Component {
 
     this.setState({
       inputValue: result,
-      firstValue: this.state.inputValue,
+      firstValue: result,
       calcBarText: "",
       calcBarSign: "",
       historyText: this.state.historyText.concat(historyTextNew),
       historyKey: this.state.historyKey + 1,
-      lastValue: lastValue
+      lastValue: lastValue,
+      isWriteNewNum: isWriteNewNum,
+      isInputChange: isInputChange
     });
   };
 
@@ -197,36 +241,6 @@ class App extends Component {
       return "Error";
     }
   };
-
-  render() {
-    return (
-      <React.Fragment>
-        <div className="container">
-          <div className="calc-container">
-            <CalcBar
-              calcBarText={this.state.calcBarText}
-              calcBarSign={this.state.calcBarSign}
-            />
-            <InputBar
-              inputValue={this.state.inputValue}
-              onEditInput={this.handleEditKeyboardInput}
-            />
-            <div className="btn-container">
-              <NumPad
-                onNumClick={this.handleAddNumToInputFromBtn}
-                onFunctionClick={this.handleNewFunction}
-              />
-              <FunctionPad onFunctionClick={this.handleNewFunction} />
-            </div>
-          </div>
-          <HistoryAndMemory
-            numMemory={this.state.numMemory}
-            historyText={this.state.historyText}
-          />
-        </div>
-      </React.Fragment>
-    );
-  }
 }
 
 export default App;
