@@ -12,13 +12,14 @@ class App extends Component {
     inputValue: 0,
     calcBarText: "",
     calcBarSign: "",
-    modifyInput: "",
+    modifyInputText: "",
     chosenSign: null,
     firstValue: null,
     lastValue: null,
     numMemory: null,
     isWriteNewNum: false,
     isInputChange: false,
+    isError: false,
     historyText: [],
     historyKey: 0
   };
@@ -27,23 +28,22 @@ class App extends Component {
     let inputValue = this.state.inputValue;
     let lastValue = this.state.lastValue;
     let isWriteNewNum = this.state.isWriteNewNum;
-    if (!isNaN(this.state.inputValue + num.toString())) {
-      if (
-        this.state.inputValue === 0 ||
-        lastValue === null ||
-        isWriteNewNum === true
-      ) {
-        inputValue = num;
-        isWriteNewNum = false;
-        console.log("imIn");
-        if (lastValue === null) {
-          lastValue = "temp";
+    if (!this.state.isError) {
+      if (!isNaN(this.state.inputValue + num.toString())) {
+        if (
+          this.state.inputValue === 0 ||
+          lastValue === null ||
+          isWriteNewNum === true
+        ) {
+          inputValue = num;
+          isWriteNewNum = false;
+          lastValue === null ? (lastValue = "temp") : (lastValue = lastValue);
+        } else {
+          inputValue = (this.state.inputValue + num.toString()).substr(0, 15);
         }
-      } else {
-        inputValue = (this.state.inputValue + num.toString()).substr(0, 15);
       }
+      this.setState({ inputValue, lastValue, isWriteNewNum });
     }
-    this.setState({ inputValue, lastValue, isWriteNewNum });
   };
 
   handleEditKeyboardInput = event => {
@@ -66,24 +66,27 @@ class App extends Component {
   };
 
   handleNewFunction = sign => {
-    if (sign === "ce") {
-      this.DeleteInput();
-    } else if (sign === "c") {
+    if (sign === "c") {
       this.DeleteCalculations();
-    } else if (sign === "ms") {
-      this.saveToMemory();
-    } else if (sign === "mr") {
-      this.inputMemory();
-    } else if (sign === "mc") {
-      this.clearMemory();
-    } else if (sign === "+-") {
-      this.changeSignInput();
-    } else if (sign === "+" || sign === "-" || sign === "*" || sign === "/") {
-      this.handleChosenSign(sign);
-    } else if (sign === "²" || sign === "√") {
-      this.modifyInput(sign);
-    } else if (sign === "=") {
-      this.showResult();
+    }
+    if (!this.state.isError) {
+      if (sign === "ce") {
+        this.DeleteInput();
+      } else if (sign === "ms") {
+        this.saveToMemory();
+      } else if (sign === "mr") {
+        this.inputMemory();
+      } else if (sign === "mc") {
+        this.clearMemory();
+      } else if (sign === "+-") {
+        this.changeSignInput();
+      } else if (sign === "+" || sign === "-" || sign === "*" || sign === "/") {
+        this.handleChosenSign(sign);
+      } else if (sign === "²" || sign === "√") {
+        this.modifyInput(sign);
+      } else if (sign === "=") {
+        this.showResult();
+      }
     }
   };
 
@@ -95,7 +98,7 @@ class App extends Component {
             <CalcBar
               calcBarText={this.state.calcBarText}
               calcBarSign={this.state.calcBarSign}
-              modifyInput={this.state.modifyInput}
+              modifyInputText={this.state.modifyInputText}
             />
             <InputBar
               inputValue={this.state.inputValue}
@@ -120,57 +123,52 @@ class App extends Component {
   }
 
   DeleteInput = () => {
-    const inputValue = 0;
-    this.setState({
-      inputValue: inputValue
-    });
+    this.setState({ inputValue: 0 });
   };
 
   DeleteCalculations = () => {
-    const numMemory = this.state.numMemory;
     this.setState({
       inputValue: 0,
       calcBarText: "",
       calcBarSign: "",
-      modifyInput: "",
+      modifyInputText: "",
       chosenSign: null,
       firstValue: null,
       lastValue: null,
-      numMemory: numMemory,
       isWriteNewNum: false,
-      isInputChange: false
+      isInputChange: false,
+      isError: false
     });
   };
 
   saveToMemory = () => {
-    const numMemory = this.state.inputValue;
-    this.setState({ numMemory });
+    this.setState({ numMemory: this.state.inputValue });
   };
 
   inputMemory = () => {
     if (this.state.numMemory !== null) {
-      const inputValue = this.state.numMemory;
-      this.setState({ inputValue });
+      this.setState({ inputValue: this.state.numMemory });
     }
   };
 
   clearMemory = () => {
-    const numMemory = null;
-    this.setState({ numMemory });
+    this.setState({ numMemory: null });
   };
 
   changeSignInput = () => {
-    const inputValue = -this.state.inputValue;
-    this.setState({ inputValue });
+    this.setState({ inputValue: -this.state.inputValue });
   };
 
   handleChosenSign = sign => {
     let firstValue = this.state.firstValue;
     let calcBarText = this.state.calcBarText;
     const lastValue = null;
+    // no firstValue or new calculation
     if (this.state.firstValue === null || this.state.isInputChange) {
       firstValue = this.state.inputValue;
-    } else if (!this.state.isInputChange) {
+    }
+    // firstValue needs calculation
+    else {
       firstValue = this.getCalculation(
         this.state.firstValue,
         this.state.chosenSign,
@@ -179,37 +177,42 @@ class App extends Component {
       this.setState({ inputValue: firstValue });
       calcBarText += " " + this.state.chosenSign + " " + this.state.inputValue;
     }
-    if (firstValue === "Error") {
-      this.setState({ inputValue: "Error" });
-    } else {
-      if (calcBarText === "") {
-        calcBarText = firstValue;
-      }
+    // initializing the calcBarText with firstValue
+    if (calcBarText === "") {
+      calcBarText = firstValue;
     }
-    this.setState({
-      firstValue: firstValue,
-      lastValue: lastValue,
-      calcBarText: calcBarText,
-      calcBarSign: sign,
-      chosenSign: sign,
-      isInputChange: false,
-      modifyInput: ""
-    });
+
+    if (firstValue !== "Error") {
+      this.setState({
+        firstValue: firstValue,
+        lastValue: lastValue,
+        calcBarText: calcBarText,
+        calcBarSign: sign,
+        chosenSign: sign,
+        isInputChange: false,
+        modifyInputText: ""
+      });
+    }
   };
 
   modifyInput = sign => {
-    let modifyInput;
-    this.state.modifyInput === ""
-      ? (modifyInput = this.state.inputValue)
-      : (modifyInput = this.state.modifyInput);
+    let modifyInputText;
+    this.state.modifyInputText === ""
+      ? (modifyInputText = this.state.inputValue)
+      : (modifyInputText = this.state.modifyInputText);
     let inputValue = this.state.inputValue;
+    // creating the calculation text
     if (sign === "²") {
-      modifyInput = "(" + modifyInput + ")" + sign;
+      modifyInputText = "(" + modifyInputText + ")" + sign;
     } else if (sign === "√") {
-      modifyInput = sign + "(" + modifyInput + ")";
+      modifyInputText = sign + "(" + modifyInputText + ")";
     }
+    // calculating
     inputValue = this.getCalculation(this.state.inputValue, sign);
-    this.setState({ inputValue, modifyInput });
+
+    if (inputValue !== "Error") {
+      this.setState({ inputValue, modifyInputText });
+    }
   };
 
   showResult = () => {
@@ -220,6 +223,7 @@ class App extends Component {
     const firstValue = isInputChange
       ? this.state.inputValue
       : this.state.firstValue;
+    // seting the lastValue number
     if (this.state.lastValue === "temp" || this.state.lastValue === null) {
       lastValue = this.state.inputValue;
       isWriteNewNum = true;
@@ -227,11 +231,13 @@ class App extends Component {
     } else {
       calcBarText = this.state.inputValue;
     }
+    // geting the result
     let result = this.getCalculation(
       firstValue,
       this.state.chosenSign,
       lastValue
     );
+    // seting a new history calculation line
     const historyTextNew = {
       text:
         calcBarText +
@@ -243,18 +249,21 @@ class App extends Component {
         result,
       key: this.state.historyKey
     };
-    this.setState({
-      inputValue: result,
-      firstValue: result,
-      calcBarText: "",
-      calcBarSign: "",
-      historyText: this.state.historyText.concat(historyTextNew),
-      historyKey: this.state.historyKey + 1,
-      lastValue: lastValue,
-      isWriteNewNum: isWriteNewNum,
-      isInputChange: isInputChange,
-      modifyInput: ""
-    });
+
+    if (result !== "Error") {
+      this.setState({
+        inputValue: result,
+        firstValue: result,
+        calcBarText: "",
+        calcBarSign: "",
+        historyText: this.state.historyText.concat(historyTextNew),
+        historyKey: this.state.historyKey + 1,
+        lastValue: lastValue,
+        isWriteNewNum: isWriteNewNum,
+        isInputChange: isInputChange,
+        modifyInputText: ""
+      });
+    }
   };
 
   getCalculation = (firstValue, sign, lastValue) => {
@@ -270,6 +279,13 @@ class App extends Component {
     if (sum < Math.pow(10, 15)) {
       return sum;
     } else {
+      this.setState({
+        isError: true,
+        inputValue: "Error",
+        calcBarText: "",
+        calcBarSign: "",
+        modifyInputText: ""
+      });
       return "Error";
     }
   };
