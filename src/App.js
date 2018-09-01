@@ -24,6 +24,27 @@ class App extends Component {
     historyKey: 0
   };
 
+  onKeyDown = event => {
+    const key = event.keyCode;
+    if (key >= 96 && key <= 105) {
+      this.handleAddNumToInputFromBtn(key - 96);
+    } else if (key >= 48 && key <= 57) {
+      this.handleAddNumToInputFromBtn(key - 48);
+    } else if (key === 107) {
+      this.handleChosenSign("+");
+    }else if (key === 109) {
+      this.handleChosenSign("-");
+    }else if (key === 106) {
+      this.handleChosenSign("*");
+    }else if (key === 111) {
+      this.handleChosenSign("/");
+    }else if (key === 13) {
+      this.showResult();
+    }else if (key === 110) {
+      this.handleChosenSign(".");
+    }
+  };
+
   handleAddNumToInputFromBtn = num => {
     let inputValue = this.state.inputValue;
     let lastValue = this.state.lastValue;
@@ -79,7 +100,7 @@ class App extends Component {
       } else if (sign === "mc") {
         this.clearMemory();
       } else if (sign === "+-") {
-        this.changeSignInput();
+        this.changePlusMinusSignInput();
       } else if (sign === "+" || sign === "-" || sign === "*" || sign === "/") {
         this.handleChosenSign(sign);
       } else if (sign === "²" || sign === "√") {
@@ -93,7 +114,7 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <div className="container">
+        <div className="container" onKeyDown={this.onKeyDown} tabIndex="0">
           <div className="calc-container">
             <CalcBar
               calcBarText={this.state.calcBarText}
@@ -155,7 +176,7 @@ class App extends Component {
     this.setState({ numMemory: null });
   };
 
-  changeSignInput = () => {
+  changePlusMinusSignInput = () => {
     this.setState({ inputValue: -this.state.inputValue });
   };
 
