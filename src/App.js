@@ -12,6 +12,7 @@ class App extends Component {
     inputValue: 0,
     calcBarText: "",
     calcBarSign: "",
+    modifyInput: "",
     chosenSign: null,
     firstValue: null,
     lastValue: null,
@@ -27,9 +28,14 @@ class App extends Component {
     let lastValue = this.state.lastValue;
     let isWriteNewNum = this.state.isWriteNewNum;
     if (!isNaN(this.state.inputValue + num.toString())) {
-      if (this.state.inputValue === 0 || lastValue === null || isWriteNewNum === true) {
+      if (
+        this.state.inputValue === 0 ||
+        lastValue === null ||
+        isWriteNewNum === true
+      ) {
         inputValue = num;
         isWriteNewNum = false;
+        console.log("imIn");
         if (lastValue === null) {
           lastValue = "temp";
         }
@@ -74,9 +80,8 @@ class App extends Component {
       this.changeSignInput();
     } else if (sign === "+" || sign === "-" || sign === "*" || sign === "/") {
       this.handleChosenSign(sign);
-    } else if (sign === "&#178;" || sign === "&#8730;") {
-      this.handleChosenSign(sign);
-      this.showResult();
+    } else if (sign === "²" || sign === "√") {
+      this.modifyInput(sign);
     } else if (sign === "=") {
       this.showResult();
     }
@@ -90,6 +95,7 @@ class App extends Component {
             <CalcBar
               calcBarText={this.state.calcBarText}
               calcBarSign={this.state.calcBarSign}
+              modifyInput={this.state.modifyInput}
             />
             <InputBar
               inputValue={this.state.inputValue}
@@ -116,7 +122,7 @@ class App extends Component {
   DeleteInput = () => {
     const inputValue = 0;
     this.setState({
-      inputValue: inputValue,
+      inputValue: inputValue
     });
   };
 
@@ -126,11 +132,13 @@ class App extends Component {
       inputValue: 0,
       calcBarText: "",
       calcBarSign: "",
+      modifyInput: "",
       chosenSign: null,
       firstValue: null,
       lastValue: null,
       numMemory: numMemory,
-      isWriteNewNum: false
+      isWriteNewNum: false,
+      isInputChange: false
     });
   };
 
@@ -160,10 +168,9 @@ class App extends Component {
     let firstValue = this.state.firstValue;
     let calcBarText = this.state.calcBarText;
     const lastValue = null;
-    const chosenSign = sign;
-    if (this.state.firstValue === null) {
+    if (this.state.firstValue === null || this.state.isInputChange) {
       firstValue = this.state.inputValue;
-    } else if (this.state.firstValue !== this.state.inputValue) {
+    } else if (!this.state.isInputChange) {
       firstValue = this.getCalculation(
         this.state.firstValue,
         this.state.chosenSign,
@@ -184,9 +191,25 @@ class App extends Component {
       lastValue: lastValue,
       calcBarText: calcBarText,
       calcBarSign: sign,
-      chosenSign: chosenSign,
-      isInputChange: false
+      chosenSign: sign,
+      isInputChange: false,
+      modifyInput: ""
     });
+  };
+
+  modifyInput = sign => {
+    let modifyInput;
+    this.state.modifyInput === ""
+      ? (modifyInput = this.state.inputValue)
+      : (modifyInput = this.state.modifyInput);
+    let inputValue = this.state.inputValue;
+    if (sign === "²") {
+      modifyInput = "(" + modifyInput + ")" + sign;
+    } else if (sign === "√") {
+      modifyInput = sign + "(" + modifyInput + ")";
+    }
+    inputValue = this.getCalculation(this.state.inputValue, sign);
+    this.setState({ inputValue, modifyInput });
   };
 
   showResult = () => {
@@ -194,7 +217,9 @@ class App extends Component {
     let calcBarText = this.state.calcBarText;
     let isInputChange = this.state.isInputChange;
     let isWriteNewNum = this.state.isWriteNewNum;
-    const firstValue = (isInputChange ? this.state.inputValue : this.state.firstValue);
+    const firstValue = isInputChange
+      ? this.state.inputValue
+      : this.state.firstValue;
     if (this.state.lastValue === "temp" || this.state.lastValue === null) {
       lastValue = this.state.inputValue;
       isWriteNewNum = true;
@@ -218,7 +243,6 @@ class App extends Component {
         result,
       key: this.state.historyKey
     };
-
     this.setState({
       inputValue: result,
       firstValue: result,
@@ -228,12 +252,20 @@ class App extends Component {
       historyKey: this.state.historyKey + 1,
       lastValue: lastValue,
       isWriteNewNum: isWriteNewNum,
-      isInputChange: isInputChange
+      isInputChange: isInputChange,
+      modifyInput: ""
     });
   };
 
   getCalculation = (firstValue, sign, lastValue) => {
-    const sum = eval(firstValue + sign + lastValue);
+    let sum;
+    if (sign === "²") {
+      sum = Math.pow(firstValue, 2);
+    } else if (sign === "√") {
+      sum = Math.sqrt(firstValue);
+    } else {
+      sum = eval(firstValue + sign + lastValue);
+    }
     console.log(sum);
     if (sum < Math.pow(10, 15)) {
       return sum;
