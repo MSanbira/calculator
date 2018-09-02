@@ -218,6 +218,9 @@ p {
     padding-right: 10px;
     height: 200px;
   }
+  .history-text {
+    height: 160px;
+  }
   .memory-container {
     width: 200px;
     padding-top: 0;
@@ -247,11 +250,11 @@ p {
     border-right: none;
     border-bottom: solid darkgray 0.5px;
     padding-right: 0;
-    height: 200px;
   }
   .memory-container {
     width: 100%;
     padding-top: 10px;
+    height: 100px;
   }
 }
 
@@ -261,7 +264,7 @@ p {
   }
 }
 
-@media (max-width: 310px) {
+@media (max-width: 320px) {
   .btn-container {
     flex-flow: column;
     align-items: center;

@@ -36,15 +36,15 @@ class App extends Component {
       this.handleAddNumToInputFromBtn(key - 48);
     } else if (key === 107) {
       this.handleChosenSign("+");
-    }else if (key === 109) {
+    } else if (key === 109) {
       this.handleChosenSign("-");
-    }else if (key === 106) {
+    } else if (key === 106) {
       this.handleChosenSign("*");
-    }else if (key === 111) {
+    } else if (key === 111) {
       this.handleChosenSign("/");
-    }else if (key === 13) {
+    } else if (key === 13) {
       this.showResult();
-    }else if (key === 110) {
+    } else if (key === 110) {
       this.handleAddNumToInputFromBtn(".");
     }
   };
@@ -69,20 +69,10 @@ class App extends Component {
       }
       this.setState({ inputValue, lastValue, isWriteNewNum });
     }
-  };
-
-  handleEditKeyboardInput = event => {
-    let inputValue;
-    if (!isNaN(event.target.value)) {
-      if (this.state.inputValue === 0 && event.target.value !== "0.") {
-        inputValue = event.target.value.substr(1, 16);
-      } else {
-        inputValue = event.target.value.substr(0, 15);
-      }
-      if (event.target.value === "") {
-        inputValue = 0;
-      }
-      this.setState({ inputValue });
+    // blur to all btns
+    const btns = document.querySelectorAll(".btn");
+    for (const btn of btns) {
+      btn.blur();
     }
   };
 
@@ -112,6 +102,11 @@ class App extends Component {
       } else if (sign === "=") {
         this.showResult();
       }
+    }
+    // blur to all btns
+    const btns = document.querySelectorAll(".btn");
+    for (const btn of btns) {
+      btn.blur();
     }
   };
 
@@ -221,6 +216,7 @@ class App extends Component {
   };
 
   modifyInput = sign => {
+    console.log("modify");
     let modifyInputText;
     this.state.modifyInputText === ""
       ? (modifyInputText = this.state.inputValue)
@@ -245,6 +241,7 @@ class App extends Component {
     let calcBarText = this.state.calcBarText;
     let isInputChange = this.state.isInputChange;
     let isWriteNewNum = this.state.isWriteNewNum;
+    let result;
     const firstValue = isInputChange
       ? this.state.inputValue
       : this.state.firstValue;
@@ -257,17 +254,21 @@ class App extends Component {
       calcBarText = this.state.inputValue;
     }
     // geting the result
-    let result = this.getCalculation(
-      firstValue,
-      this.state.chosenSign,
-      lastValue
-    );
+    if (firstValue === null || this.state.chosenSign === null) {
+      result = this.state.inputValue;
+    } else {
+      result = this.getCalculation(
+        firstValue,
+        this.state.chosenSign,
+        lastValue
+      );
+    }
     // seting a new history calculation line
     const historyTextNew = {
       text:
-        calcBarText +
-        " " +
-        this.state.chosenSign +
+        (this.state.chosenSign !== null
+          ? calcBarText + " " + this.state.chosenSign
+          : "") +
         " " +
         lastValue +
         " = " +
@@ -301,7 +302,7 @@ class App extends Component {
       sum = eval(firstValue + sign + lastValue);
     }
     console.log(sum);
-    if (sum < Math.pow(10, 15)) {
+    if (sum < Math.pow(10, 15) && sum !== NaN) {
       return sum;
     } else {
       this.setState({
