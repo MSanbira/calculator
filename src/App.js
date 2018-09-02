@@ -24,7 +24,11 @@ class App extends Component {
     historyKey: 0
   };
 
-  onKeyDown = event => {
+  componentWillMount() {
+    document.addEventListener("keydown", this.handleOnKeyDown);
+  }
+
+  handleOnKeyDown = event => {
     const key = event.keyCode;
     if (key >= 96 && key <= 105) {
       this.handleAddNumToInputFromBtn(key - 96);
@@ -41,7 +45,7 @@ class App extends Component {
     }else if (key === 13) {
       this.showResult();
     }else if (key === 110) {
-      this.handleChosenSign(".");
+      this.handleAddNumToInputFromBtn(".");
     }
   };
 
@@ -114,7 +118,7 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <div className="container" onKeyDown={this.onKeyDown} tabIndex="0">
+        <div className="container" tabIndex="0">
           <div className="calc-container">
             <CalcBar
               calcBarText={this.state.calcBarText}
